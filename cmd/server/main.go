@@ -52,6 +52,7 @@ func start() int {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
+	// following runs in background as a goroutine
 	errGroup.Go(func() error {
 		fmt.Println("context started listening for signals")
 		<-ctx.Done()
@@ -69,6 +70,7 @@ func start() int {
 		return 1
 	}
 
+	// blocks here after server is started
 	if err := errGroup.Wait(); err != nil {
 		return 1
 	}
