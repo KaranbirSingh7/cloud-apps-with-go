@@ -5,20 +5,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi/v5"
+//	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 type Server struct {
 	address string
-	mux     chi.Router
 	server  *http.Server
 	log     *zap.Logger
+	mux     *mux.Router
 }
 
 type Options struct {
@@ -27,28 +28,30 @@ type Options struct {
 	Log  *zap.Logger
 }
 
-func New(opts Options) *Server {
+func NewServer(opts Options) *Server {
 	if opts.Log == nil {
 		opts.Log = zap.NewNop()
 	}
 
 	address := net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
-	mux := chi.NewMux()
+
+	r := mux.NewRouter()
+
 	return &Server{
 		address: address,
-		mux:     mux,
-		log:     opts.Log,
+		mux: r,
 		server: &http.Server{
 			Addr:              address,
-			Handler:           mux,
+			Handler:           r,
 			ReadTimeout:       5 * time.Second,
 			ReadHeaderTimeout: 5 * time.Second,
 			WriteTimeout:      5 * time.Second,
 			IdleTimeout:       5 * time.Second,
-		},
+			},
+			log: opts.Log,
 	}
-}
 
+}
 func (s *Server) Start() error {
 	s.setupRoutes()
 

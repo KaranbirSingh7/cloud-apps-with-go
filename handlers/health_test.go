@@ -2,45 +2,48 @@ package handlers_test
 
 import (
 	"canvas/handlers"
-	"io"
+	"github.com/gorilla/mux"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/matryer/is"
 )
 
-func TestHealth(t *testing.T) {
-	t.Run("returns 200 for /health", func(t *testing.T) {
+func TestHealthz(t *testing.T) {
+	t.Run("check body for /healthz", func(t *testing.T) {
 		is := is.New(t)
 
-		mux := chi.NewMux()
-		handlers.Health(mux)
-		code, _, _ := makeGetRequest(mux, "/health")
-		is.Equal(http.StatusOK, code)
+		// init routes
+		r := mux.NewRouter()
+		r.HandleFunc("/healthz", handlers.Healthz) // test our health function
+
+		_, _, body := makeRequest(r)
+		is.Equal("up", body)
 	})
 
-	t.Run("check body for /health", func(t *testing.T) {
+	t.Run("returns 200 for /healthz", func(t *testing.T) {
 		is := is.New(t)
 
-		mux := chi.NewMux()
-		handlers.Health(mux)
-		_, _, body := makeGetRequest(mux, "/health")
-		is.Equal("ok", body)
+		// init routes
+		r := mux.NewRouter()
+		r.HandleFunc("/healthz", handlers.Healthz) // test our health function
+
+		statusCode, _, _ := makeRequest(r)
+		is.Equal(http.StatusOK, statusCode)
 	})
 }
 
-// makeGetRequest and returns the status code, response headers, and the body.
-func makeGetRequest(handler http.Handler, target string) (int, http.Header, string) {
-	req := httptest.NewRequest(http.MethodGet, target, nil)
-	res := httptest.NewRecorder()
+func makeRequest(r *mux.Router) (int, http.Header, string) {
+	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)
+	res := httptest.NewRecorder() // mock http
 
-	handler.ServeHTTP(res, req)
+	r.ServeHTTP(res, req)
 	result := res.Result()
-	bodyBytes, err := io.ReadAll(result.Body)
+	bodyBytes, err := ioutil.ReadAll(result.Body)
 	if err != nil {
-		panic(err)
+		return 0, nil, "" //aka error/failure decoding reading body
 	}
 	return result.StatusCode, result.Header, string(bodyBytes)
 

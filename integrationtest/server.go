@@ -13,7 +13,7 @@ import (
 //	cleanup := CreateServer()
 //	defer cleanup()
 func CreateServer() func() {
-	s := server.New(server.Options{
+	s := server.NewServer(server.Options{
 		Host: "localhost",
 		Port: 8081,
 	})
