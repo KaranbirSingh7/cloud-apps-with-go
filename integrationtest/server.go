@@ -9,7 +9,6 @@ import (
 
 // CreateServer for testing on port 8081, returning a cleanup function that stops the server.
 // Usage:
-//
 //	cleanup := CreateServer()
 //	defer cleanup()
 func CreateServer() func() {
