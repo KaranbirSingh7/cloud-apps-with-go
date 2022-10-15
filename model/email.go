@@ -20,7 +20,7 @@ var emailAddressMatcher = regexp.MustCompile(
 type Email string
 
 func (e Email) IsValid() bool {
-	return emailAddressMatcher.MatchString(string(e))
+	return emailAddressMatcher.MatchString(string(e)) //true / false result
 }
 
 func (e Email) String() string {

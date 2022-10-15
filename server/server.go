@@ -28,6 +28,13 @@ type Options struct {
 	Log  *zap.Logger
 }
 
+func (o *Options) loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		o.Log.Info("", zap.String("url", r.RequestURI))
+		next.ServeHTTP(w, r)
+	})
+}
+
 func NewServer(opts Options) *Server {
 	if opts.Log == nil {
 		opts.Log = zap.NewNop()
@@ -36,6 +43,8 @@ func NewServer(opts Options) *Server {
 	address := net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
 
 	r := mux.NewRouter()
+
+	r.Use(opts.loggingMiddleware)
 
 	return &Server{
 		address: address,
@@ -52,6 +61,7 @@ func NewServer(opts Options) *Server {
 	}
 
 }
+
 func (s *Server) Start() error {
 	s.setupRoutes()
 

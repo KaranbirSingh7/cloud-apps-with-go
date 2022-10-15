@@ -3,7 +3,6 @@ module canvas
 go 1.18
 
 require (
-	github.com/go-chi/chi/v5 v5.0.7
 	github.com/gorilla/mux v1.8.0
 	github.com/maragudk/gomponents v0.18.0
 	github.com/maragudk/gomponents-heroicons v0.3.0
