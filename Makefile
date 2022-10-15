@@ -4,7 +4,7 @@ APP_NAME=canvas
 DOCKER_REGISTRY=docker.io
 DOCKER_USERNAME=karanbirsingh
 GIT_HASH ?= $(shell git log --format="%h" -n 1)
-AZ_RESOURCE_GROUP=1-e25a66a6-playground-sandbox
+AZ_RESOURCE_GROUP=$(shell az group list | jq '.[].name')
 AZ_ACI_APP_NAME=canvas-app
 
 .PHONY: docker-build
@@ -43,8 +43,8 @@ aci-deploy:
 		--name ${AZ_ACI_APP_NAME} \
 		--image ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME} \
 		--dns-name-label ${AZ_ACI_APP_NAME} \
-		--ports 80 \
-		--environment-variables 'PORT'='80'
+		--ports 443 \
+		--environment-variables 'PORT'='443'
 
 .PHONY: aci-destroy
 aci-destroy:
