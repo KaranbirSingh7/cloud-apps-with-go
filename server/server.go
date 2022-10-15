@@ -2,6 +2,7 @@
 package server
 
 import (
+	"canvas/storage"
 	"context"
 	"errors"
 	"fmt"
@@ -16,16 +17,18 @@ import (
 )
 
 type Server struct {
-	address string
-	server  *http.Server
-	log     *zap.Logger
-	mux     *mux.Router
+	address  string
+	database *storage.Database
+	server   *http.Server
+	log      *zap.Logger
+	mux      *mux.Router
 }
 
 type Options struct {
-	Host string
-	Port int
-	Log  *zap.Logger
+	Database *storage.Database
+	Host     string
+	Port     int
+	Log      *zap.Logger
 }
 
 func (o *Options) loggingMiddleware(next http.Handler) http.Handler {
@@ -47,8 +50,9 @@ func NewServer(opts Options) *Server {
 	r.Use(opts.loggingMiddleware)
 
 	return &Server{
-		address: address,
-		mux:     r,
+		address:  address,
+		database: opts.Database,
+		mux:      r,
 		server: &http.Server{
 			Addr:              net.JoinHostPort("", strconv.Itoa(opts.Port)),
 			Handler:           r,
@@ -63,6 +67,12 @@ func NewServer(opts Options) *Server {
 }
 
 func (s *Server) Start() error {
+	// connect to DB
+	if err := s.database.Connect(); err != nil {
+		return fmt.Errorf("error connecting to database: %w", err)
+	}
+
+	// init the routes
 	s.setupRoutes()
 
 	// log.Printf("Starting on %s", s.address)
