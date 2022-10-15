@@ -13,4 +13,6 @@ WORKDIR /app
 COPY --from=builder /bin/server ./
 
 ENV PORT=80
+# this container exposes 8080 to outside world
+EXPOSE 80
 CMD ["./server"]
