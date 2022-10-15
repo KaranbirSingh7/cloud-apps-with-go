@@ -111,5 +111,6 @@ func (d *Database) Ping(ctx context.Context) error {
 
 	//check if it can handle queries
 	_, err := d.DB.ExecContext(ctx, `select `)
+
 	return err
 }

@@ -18,6 +18,7 @@ func HealthzWrapper(r *mux.Router, p pinger) {
 			http.Error(w, err.Error(), http.StatusBadGateway)
 			return
 		}
+		fmt.Fprint(w, "up")
 	})
 }
 
