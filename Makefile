@@ -1,13 +1,24 @@
-.PHONY: build cover start test test-integration
+.PHONY: docker-build cover test test-integration
 
-build:
-	docker build -t canvas .
+APP_NAME=canvas
+DOCKER_USERNAME=karanbirsingh
+GIT_HASH ?= $(shell git log --format="%h" -n 1)
+
+docker-build:
+	docker build --tag ${DOCKER_USERNAME}/${APP_NAME}:${GIT_HASH} .
+
+docker-push:
+	docker push ${DOCKER_USERNAME}/${APP_NAME}:${GIT_HASH}
+
+docker-release:
+	docker tag ${DOCKER_USERNAME}/${APP_NAME}:${GIT_HASH} ${DOCKER_USERNAME}/${APP_NAME}:latest
+	docker push ${DOCKER_USERNAME}/${APP_NAME}:latest
 
 cover:
 	go tool cover -html=cover.out
 
-start:
-	go run cmd/server/*.go
+run:
+	go run -race cmd/server/*.go
 
 test:
 	go test -coverprofile=cover.out -short ./...
