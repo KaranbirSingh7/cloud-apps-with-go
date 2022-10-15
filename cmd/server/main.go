@@ -16,6 +16,7 @@ import (
 )
 
 // release is set through the linker at build time, generally from a git sha.
+// passed during build process
 // Used for logging and error reporting.
 var release string
 
@@ -41,7 +42,7 @@ func start() int {
 	host := getStringOrDefault("HOST", "localhost")
 	port := getIntOrDefault("PORT", 8080)
 
-	s := server.New(server.Options{
+	s := server.NewServer(server.Options{
 		Host: host,
 		Port: port,
 		Log:  log,

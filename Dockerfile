@@ -5,9 +5,9 @@ COPY go.mod go.sum ./
 RUN go mod download -x
 
 COPY . ./
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-X 'main.release=$(git rev-parse --short=8 HEAD)'" -o /bin/server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-X 'main.release=$(git rev-parse --short=8 HEAD)'" -o /bin/server ./cmd/server
 
-FROM gcr.io/distroless/base-debian11
+FROM scratch
 WORKDIR /app
 
 COPY --from=builder /bin/server ./
