@@ -5,13 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 
-//	"github.com/go-chi/chi/v5"
+	"github.com/gorilla/mux"
+
 	"go.uber.org/zap"
 )
 
@@ -39,16 +39,16 @@ func NewServer(opts Options) *Server {
 
 	return &Server{
 		address: address,
-		mux: r,
+		mux:     r,
 		server: &http.Server{
-			Addr:              address,
+			Addr:              net.JoinHostPort("", strconv.Itoa(opts.Port)),
 			Handler:           r,
 			ReadTimeout:       5 * time.Second,
 			ReadHeaderTimeout: 5 * time.Second,
 			WriteTimeout:      5 * time.Second,
 			IdleTimeout:       5 * time.Second,
-			},
-			log: opts.Log,
+		},
+		log: opts.Log,
 	}
 
 }
