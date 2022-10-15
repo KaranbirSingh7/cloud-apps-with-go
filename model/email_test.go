@@ -28,4 +28,15 @@ func TestEmail_IsValid(t *testing.T) {
 			})
 		}
 	})
+	// this is just a fun test to check if total test coverage goes high
+	// if you are wondering, it does increase total test converage
+	t.Run("check if email string matches with user input", func(t *testing.T) {
+		for _, test := range tests {
+			t.Run(test.address, func(t *testing.T) {
+				is := is.New(t)
+				e := model.Email(test.address)
+				is.Equal(e.String(), test.address)
+			})
+		}
+	})
 }
