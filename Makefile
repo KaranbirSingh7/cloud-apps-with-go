@@ -43,11 +43,22 @@ aci-deploy:
 		--name ${AZ_ACI_APP_NAME} \
 		--image ${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME} \
 		--dns-name-label ${AZ_ACI_APP_NAME} \
-		--ports 443 \
-		--environment-variables 'PORT'='443'
+		--ports 80 \
+		--environment-variables 'PORT'='80'
 
 .PHONY: aci-destroy
 aci-destroy:
 	az container delete \
 		--resource-group ${AZ_RESOURCE_GROUP} \
 		--name ${AZ_ACI_APP_NAME} -y
+
+.PHONY: db-start
+db-start:
+	@docker container run --name postgres-canvas -d -p 5432:5432 -e POSTGRES_USER='canvas' -e POSTGRES_PASSWORD='postgres' -v /tmp/postgres:/var/lib/postgresql/data postgres:12
+
+.PHONY: db-stop
+db-stop:
+	@docker container rm -f postgres-canvas || true
+
+.PHONY: db-restart
+db-restart: db-stop db-start

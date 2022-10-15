@@ -1,0 +1,4 @@
+DB_USER=canvas
+DB_PASSWORD=
+DB_NAME=canvas
+DB_PORT=5432
