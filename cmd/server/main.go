@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/maragudk/env"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
@@ -73,7 +72,7 @@ func start() int {
 		return nil
 	})
 
-	// start server
+	// start server, also connect to DB and other stuff
 	if err := s.Start(); err != nil {
 		log.Info("Error starting server", zap.Error(err))
 		return 1
@@ -99,24 +98,13 @@ func createLogger(env string) (*zap.Logger, error) {
 }
 
 func createAzureServiceBus(log *zap.Logger) *messaging.Queue {
-	connStrAzureServiceBus := fmt.Sprintf(
-		"Endpoint=sb://%s.servicebus.windows.net/;SharedAccessKeyName=%s;SharedAccessKey=%s", os.Getenv("AZURE_SERVICEBUS_NAMESPACE"), os.Getenv("AZURE_SERVICEBUS_KEY_NAME"), os.Getenv("AZURE_SERVICEBUS_KEY_VALUE"),
-	)
-
-	client, err := azservicebus.NewClientFromConnectionString(connStrAzureServiceBus, nil)
-	if err != nil {
-		log.Error("ERROR: unable to create new Azure Service Bus client")
-
-		return nil
-	}
-
 	return messaging.NewQueue(
 		messaging.NewQueueOptions{
-			Client:    client,
-			Namespace: os.Getenv("AZURE_SERVICEBUS_NAMESPACE"),
-			Log:       log,
-			Name:      os.Getenv("AZURE_SERVICEBUS_QUEUE_NAME"),
-			WaitTime:  20 * time.Second,
+			Namespace:   os.Getenv("AZURE_SERVICEBUS_NAMESPACE"),
+			Log:         log,
+			Name:        os.Getenv("AZURE_SERVICEBUS_QUEUE_NAME"),
+			KeyName:     os.Getenv("AZURE_SERVICEBUS_KEY_NAME"),
+			KeyPassword: os.Getenv("AZURE_SERVICEBUS_KEY_VALUE"),
 		},
 	)
 }

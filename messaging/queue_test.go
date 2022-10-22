@@ -1,12 +1,5 @@
 package messaging_test
 
-// import (
-// 	"canvas/integrationtest"
-// 	"testing"
-
-// 	"github.com/matryer/is"
-// )
-
 // func TestQueue(t *testing.T) {
 // 	integrationtest.SkipIfShort(t) // -short flag meaning skip this test
 

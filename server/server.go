@@ -81,12 +81,18 @@ func (s *Server) Start() error {
 	// init the routes
 	s.setupRoutes()
 
-	err := s.queue.Send(context.TODO(), model.Message{
+	if err := s.queue.Send(context.TODO(), model.Message{
 		"jobs": "abc",
-	})
+	}); err != nil {
+		panic(err.Error())
+	}
+
+	m, err := s.queue.Receive(context.TODO())
 	if err != nil {
 		panic(err.Error())
 	}
+
+	fmt.Println(m)
 
 	// log.Printf("Starting on %s", s.address)
 	s.log.Info("Starting", zap.String("address", s.address))
