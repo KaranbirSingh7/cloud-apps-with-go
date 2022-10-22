@@ -3,6 +3,7 @@ services:
   postgres:
     image: postgres:12
     environment:
+      POSTGRES_DB: canvas
       POSTGRES_USER: canvas
       POSTGRES_PASSWORD: postgres
     ports:
