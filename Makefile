@@ -56,6 +56,16 @@ aci-destroy:
 		--resource-group ${AZ_RESOURCE_GROUP} \
 		--name ${AZ_ACI_APP_NAME} -y
 
+
+.PHONY: asb-create
+asb-create:
+	az servicebus namespace create --resource-group ${AZ_RESOURCE_GROUP} --name ${APP_NAME}-asb-ns --location eastus || true
+	az servicebus queue create --resource-group ${AZ_RESOURCE_GROUP} --namespace-name ${APP_NAME}-asb-ns --name ${APP_NAME}-asb-q || true
+	az servicebus namespace authorization-rule keys list --resource-group ${AZ_RESOURCE_GROUP} \
+		--namespace-name ${APP_NAME}-asb-ns \
+		--name RootManageSharedAccessKey \
+		--query primaryConnectionString --output tsv
+
 .PHONY: db-start
 db-start:
 	@docker-compose up -d
