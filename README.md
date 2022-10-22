@@ -5,6 +5,17 @@ This repository is used in the course [Build Cloud Apps in Go](https://www.golan
 
 ## Installation
 
+### Pre-Requiste
+
+1. Install `air` for developing locally (_this program provides hot reloding for any code changes you make_)
+    ```shell
+    curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
+    sudo mv ./bin/air /usr/local/bin/air
+    ```
+
+
+### General
+
 1. Install dependencies
     ```shell
     make

@@ -28,6 +28,10 @@ cover:
 run:
 	go run -race cmd/server/*.go
 
+.PHONY: run-debug
+run-debug:
+	air --build.cmd "go build -o bin/api cmd/server/main.go" --build.bin "./bin/api"
+
 .PHONY: test
 test:
 	go test -coverprofile=cover.out -short ./...
