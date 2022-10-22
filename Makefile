@@ -76,5 +76,6 @@ db-stop:
 
 .PHONY: db-status
 	@docker-compose ps
+
 .PHONY: db-restart
 db-restart: db-stop db-start

@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"log"
 )
 
 // This function signature satisfies our signupper interface
@@ -32,6 +31,5 @@ func createSecret() (string, error) {
 	if _, err := rand.Read(secret); err != nil {
 		return "", err
 	}
-	log.Printf("SECRET genereated -> %x", secret)
 	return fmt.Sprintf("%x", secret), nil
 }
