@@ -3,6 +3,7 @@
 package main
 
 import (
+	"canvas/messaging"
 	"canvas/server"
 	"canvas/storage"
 	"context"
@@ -12,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/maragudk/env"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
@@ -51,6 +53,7 @@ func start() int {
 		Host:     host,
 		Port:     port,
 		Log:      log,
+		Queue:    createAzureServiceBus(log),
 	})
 
 	// create error group and context to run in background and listen for signals
@@ -93,6 +96,29 @@ func createLogger(env string) (*zap.Logger, error) {
 	default:
 		return zap.NewNop(), nil
 	}
+}
+
+func createAzureServiceBus(log *zap.Logger) *messaging.Queue {
+	connStrAzureServiceBus := fmt.Sprintf(
+		"Endpoint=sb://%s.servicebus.windows.net/;SharedAccessKeyName=%s;SharedAccessKey=%s", os.Getenv("AZURE_SERVICEBUS_NAMESPACE"), os.Getenv("AZURE_SERVICEBUS_KEY_NAME"), os.Getenv("AZURE_SERVICEBUS_KEY_VALUE"),
+	)
+
+	client, err := azservicebus.NewClientFromConnectionString(connStrAzureServiceBus, nil)
+	if err != nil {
+		log.Error("ERROR: unable to create new Azure Service Bus client")
+
+		return nil
+	}
+
+	return messaging.NewQueue(
+		messaging.NewQueueOptions{
+			Client:    client,
+			Namespace: os.Getenv("AZURE_SERVICEBUS_NAMESPACE"),
+			Log:       log,
+			Name:      os.Getenv("AZURE_SERVICEBUS_QUEUE_NAME"),
+			WaitTime:  20 * time.Second,
+		},
+	)
 }
 
 func createDatabase(log *zap.Logger) *storage.Database {

@@ -2,6 +2,8 @@
 package server
 
 import (
+	"canvas/messaging"
+	"canvas/model"
 	"canvas/storage"
 	"context"
 	"errors"
@@ -22,6 +24,7 @@ type Server struct {
 	server   *http.Server
 	log      *zap.Logger
 	mux      *mux.Router
+	queue    *messaging.Queue
 }
 
 type Options struct {
@@ -29,6 +32,7 @@ type Options struct {
 	Host     string
 	Port     int
 	Log      *zap.Logger
+	Queue    *messaging.Queue
 }
 
 func (o *Options) loggingMiddleware(next http.Handler) http.Handler {
@@ -53,9 +57,11 @@ func NewServer(opts Options) *Server {
 		address:  address,
 		database: opts.Database,
 		mux:      r,
+		queue:    opts.Queue,
 		server: &http.Server{
-			Addr:              net.JoinHostPort("", strconv.Itoa(opts.Port)),
-			Handler:           r,
+			Addr:    net.JoinHostPort("", strconv.Itoa(opts.Port)),
+			Handler: r,
+
 			ReadTimeout:       5 * time.Second,
 			ReadHeaderTimeout: 5 * time.Second,
 			WriteTimeout:      5 * time.Second,
@@ -74,6 +80,13 @@ func (s *Server) Start() error {
 
 	// init the routes
 	s.setupRoutes()
+
+	err := s.queue.Send(context.TODO(), model.Message{
+		"jobs": "abc",
+	})
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// log.Printf("Starting on %s", s.address)
 	s.log.Info("Starting", zap.String("address", s.address))
