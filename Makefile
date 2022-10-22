@@ -54,11 +54,13 @@ aci-destroy:
 
 .PHONY: db-start
 db-start:
-	@docker container run --name postgres-canvas -d -p 5432:5432 -e POSTGRES_USER='canvas' -e POSTGRES_PASSWORD='postgres' -v /tmp/postgres:/var/lib/postgresql/data postgres:12
+	@docker-compose up -d
 
 .PHONY: db-stop
 db-stop:
-	@docker container rm -f postgres-canvas || true
+	@docker-compose down || true
 
+.PHONY: db-status
+	@docker-compose ps
 .PHONY: db-restart
 db-restart: db-stop db-start
