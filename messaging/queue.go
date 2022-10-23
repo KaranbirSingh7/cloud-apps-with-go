@@ -77,7 +77,7 @@ func (q *Queue) Send(ctx context.Context, m model.Message) error {
 	return nil
 }
 
-func (q *Queue) Receive(ctx context.Context) (model.Message, error) {
+func (q *Queue) Receive(ctx context.Context) (*model.Message, error) {
 	var m model.Message
 
 	receiver, err := q.Client.NewReceiverForQueue(q.name, nil)
@@ -93,7 +93,7 @@ func (q *Queue) Receive(ctx context.Context) (model.Message, error) {
 
 	for _, message := range messages {
 		body := message.Body
-		fmt.Println("Message received: %s", string(body))
+		fmt.Printf("Message received: %s", string(body))
 
 		if err := json.Unmarshal(body, &m); err != nil {
 			return nil, err
@@ -107,5 +107,5 @@ func (q *Queue) Receive(ctx context.Context) (model.Message, error) {
 
 	}
 
-	return m, nil
+	return &m, nil
 }
