@@ -77,5 +77,9 @@ db-stop:
 .PHONY: db-status
 	@docker-compose ps
 
-.PHONY: db-restart
+.PHONY : db-restart
 db-restart: db-stop db-start
+
+.PHONY: update-env-test
+update-env-test:
+	@python3 hack/update-env-vars.py
