@@ -83,3 +83,6 @@ db-restart: db-stop db-start
 .PHONY: update-env-test
 update-env-test:
 	@python3 hack/update-env-vars.py
+
+.PHONY: deploy-prod
+deploy-prod: docker-build docker-push docker-release asb-create aci-deploy
